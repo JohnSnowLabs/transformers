@@ -149,7 +149,10 @@ class AutoTokenizerTest(unittest.TestCase):
     @require_tokenizers
     def test_tokenizer_identifier_non_existent(self):
         for tokenizer_class in [BertTokenizer, BertTokenizerFast, AutoTokenizer]:
-            with self.assertRaises(EnvironmentError):
+            with self.assertRaisesRegex(
+                EnvironmentError,
+                "julien-c/herlolip-not-exists is not a local folder and is not a valid model identifier",
+            ):
                 _ = tokenizer_class.from_pretrained("julien-c/herlolip-not-exists")
 
     def test_parents_and_children_in_mappings(self):
@@ -207,6 +210,7 @@ class AutoTokenizerTest(unittest.TestCase):
         self.assertEqual(tokenizer.vocab_size, 30000)
         self.assertEqual(tokenizer.unk_token, "[UNK]")
         self.assertEqual(tokenizer.padding_side, "right")
+        self.assertEqual(tokenizer.truncation_side, "right")
 
     def test_auto_tokenizer_from_local_folder(self):
         tokenizer = AutoTokenizer.from_pretrained(SMALL_MODEL_IDENTIFIER)
@@ -307,3 +311,15 @@ class AutoTokenizerTest(unittest.TestCase):
                 del CONFIG_MAPPING._extra_content["new-model"]
             if NewConfig in TOKENIZER_MAPPING._extra_content:
                 del TOKENIZER_MAPPING._extra_content[NewConfig]
+
+    def test_repo_not_found(self):
+        with self.assertRaisesRegex(
+            EnvironmentError, "bert-base is not a local folder and is not a valid model identifier"
+        ):
+            _ = AutoTokenizer.from_pretrained("bert-base")
+
+    def test_revision_not_found(self):
+        with self.assertRaisesRegex(
+            EnvironmentError, r"aaaaaa is not a valid git identifier \(branch name, tag name or commit id\)"
+        ):
+            _ = AutoTokenizer.from_pretrained(DUMMY_UNKNOWN_IDENTIFIER, revision="aaaaaa")

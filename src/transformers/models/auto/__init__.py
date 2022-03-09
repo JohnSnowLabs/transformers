@@ -32,6 +32,7 @@ _import_structure = {
 if is_torch_available():
     _import_structure["modeling_auto"] = [
         "MODEL_FOR_AUDIO_CLASSIFICATION_MAPPING",
+        "MODEL_FOR_CAUSAL_IMAGE_MODELING_MAPPING",
         "MODEL_FOR_CAUSAL_LM_MAPPING",
         "MODEL_FOR_CTC_MAPPING",
         "MODEL_FOR_IMAGE_CLASSIFICATION_MAPPING",
@@ -52,6 +53,8 @@ if is_torch_available():
         "MODEL_WITH_LM_HEAD_MAPPING",
         "AutoModel",
         "AutoModelForAudioClassification",
+        "AutoModelForAudioFrameClassification",
+        "AutoModelForAudioXVector",
         "AutoModelForCausalLM",
         "AutoModelForCTC",
         "AutoModelForImageClassification",
@@ -82,7 +85,9 @@ if is_tf_available():
         "TF_MODEL_FOR_QUESTION_ANSWERING_MAPPING",
         "TF_MODEL_FOR_SEQ_TO_SEQ_CAUSAL_LM_MAPPING",
         "TF_MODEL_FOR_SEQUENCE_CLASSIFICATION_MAPPING",
+        "TF_MODEL_FOR_TABLE_QUESTION_ANSWERING_MAPPING",
         "TF_MODEL_FOR_TOKEN_CLASSIFICATION_MAPPING",
+        "TF_MODEL_FOR_VISION_2_SEQ_MAPPING",
         "TF_MODEL_MAPPING",
         "TF_MODEL_WITH_LM_HEAD_MAPPING",
         "TFAutoModel",
@@ -94,7 +99,9 @@ if is_tf_available():
         "TFAutoModelForQuestionAnswering",
         "TFAutoModelForSeq2SeqLM",
         "TFAutoModelForSequenceClassification",
+        "TFAutoModelForTableQuestionAnswering",
         "TFAutoModelForTokenClassification",
+        "TFAutoModelForVision2Seq",
         "TFAutoModelWithLMHead",
     ]
 
@@ -137,6 +144,7 @@ if TYPE_CHECKING:
     if is_torch_available():
         from .modeling_auto import (
             MODEL_FOR_AUDIO_CLASSIFICATION_MAPPING,
+            MODEL_FOR_CAUSAL_IMAGE_MODELING_MAPPING,
             MODEL_FOR_CAUSAL_LM_MAPPING,
             MODEL_FOR_CTC_MAPPING,
             MODEL_FOR_IMAGE_CLASSIFICATION_MAPPING,
@@ -157,6 +165,8 @@ if TYPE_CHECKING:
             MODEL_WITH_LM_HEAD_MAPPING,
             AutoModel,
             AutoModelForAudioClassification,
+            AutoModelForAudioFrameClassification,
+            AutoModelForAudioXVector,
             AutoModelForCausalLM,
             AutoModelForCTC,
             AutoModelForImageClassification,
@@ -187,7 +197,9 @@ if TYPE_CHECKING:
             TF_MODEL_FOR_QUESTION_ANSWERING_MAPPING,
             TF_MODEL_FOR_SEQ_TO_SEQ_CAUSAL_LM_MAPPING,
             TF_MODEL_FOR_SEQUENCE_CLASSIFICATION_MAPPING,
+            TF_MODEL_FOR_TABLE_QUESTION_ANSWERING_MAPPING,
             TF_MODEL_FOR_TOKEN_CLASSIFICATION_MAPPING,
+            TF_MODEL_FOR_VISION_2_SEQ_MAPPING,
             TF_MODEL_MAPPING,
             TF_MODEL_WITH_LM_HEAD_MAPPING,
             TFAutoModel,
@@ -199,7 +211,9 @@ if TYPE_CHECKING:
             TFAutoModelForQuestionAnswering,
             TFAutoModelForSeq2SeqLM,
             TFAutoModelForSequenceClassification,
+            TFAutoModelForTableQuestionAnswering,
             TFAutoModelForTokenClassification,
+            TFAutoModelForVision2Seq,
             TFAutoModelWithLMHead,
         )
 
@@ -234,4 +248,4 @@ if TYPE_CHECKING:
 else:
     import sys
 
-    sys.modules[__name__] = _LazyModule(__name__, globals()["__file__"], _import_structure)
+    sys.modules[__name__] = _LazyModule(__name__, globals()["__file__"], _import_structure, module_spec=__spec__)
