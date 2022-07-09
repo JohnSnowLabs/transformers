@@ -307,12 +307,12 @@ class LayoutLMv2OnnxConfig(OnnxConfig):
         if isinstance(preprocessor, PreTrainedTokenizerBase):
 
             batch_size = compute_effective_axis_dimension(
-                batch_size, fixed_dimension=OnnxConfig.DEFAULT_FIXED_BATCH, num_token_to_add=0
+                batch_size, fixed_dimension=OnnxConfig.default_fixed_batch, num_token_to_add=0
             )
 
             token_to_add = preprocessor.num_special_tokens_to_add(is_pair)
             seq_length = compute_effective_axis_dimension(
-                seq_length, fixed_dimension=OnnxConfig.DEFAULT_FIXED_SEQUENCE, num_token_to_add=token_to_add
+                seq_length, fixed_dimension=OnnxConfig.default_fixed_sequence, num_token_to_add=token_to_add
             )
 
             dummy_input = [[" ".join([preprocessor.unk_token])] * seq_length] * batch_size
