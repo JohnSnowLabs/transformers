@@ -12,18 +12,20 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-""" LayoutLMv2 model configuration """
-from collections import OrderedDict
-from typing import Any, List, Mapping, Optional
+""" LayoutLMv2 model configuration"""
+
+import warnings 
 
 from ... import is_torch_available
 from ...configuration_utils import PretrainedConfig
-from ...file_utils import is_detectron2_available
 from ...onnx import OnnxConfig, PatchingSpec
 from ...onnx.utils import compute_effective_axis_dimension
-from ...tokenization_utils import PreTrainedTokenizer, TensorType
-from ...utils import logging
+from ...tokenization_utils_base import PreTrainedTokenizerBase, TensorType
+from ...feature_extraction_utils import FeatureExtractionMixin
+from ...utils import is_detectron2_available, logging
 
+from collections import OrderedDict
+from typing import Any, List, Mapping, Optional, Union
 
 logger = logging.get_logger(__name__)
 
@@ -40,87 +42,87 @@ if is_detectron2_available():
 
 class LayoutLMv2Config(PretrainedConfig):
     r"""
-    This is the configuration class to store the configuration of a :class:`~transformers.LayoutLMv2Model`. It is used
-    to instantiate an LayoutLMv2 model according to the specified arguments, defining the model architecture.
-    Instantiating a configuration with the defaults will yield a similar configuration to that of the LayoutLMv2
-    `microsoft/layoutlmv2-base-uncased <https://huggingface.co/microsoft/layoutlmv2-base-uncased>`__ architecture.
+    This is the configuration class to store the configuration of a [`LayoutLMv2Model`]. It is used to instantiate an
+    LayoutLMv2 model according to the specified arguments, defining the model architecture. Instantiating a
+    configuration with the defaults will yield a similar configuration to that of the LayoutLMv2
+    [microsoft/layoutlmv2-base-uncased](https://huggingface.co/microsoft/layoutlmv2-base-uncased) architecture.
 
-    Configuration objects inherit from :class:`~transformers.PretrainedConfig` and can be used to control the model
-    outputs. Read the documentation from :class:`~transformers.PretrainedConfig` for more information.
+    Configuration objects inherit from [`PretrainedConfig`] and can be used to control the model outputs. Read the
+    documentation from [`PretrainedConfig`] for more information.
 
     Args:
-        vocab_size (:obj:`int`, `optional`, defaults to 30522):
+        vocab_size (`int`, *optional*, defaults to 30522):
             Vocabulary size of the LayoutLMv2 model. Defines the number of different tokens that can be represented by
-            the :obj:`inputs_ids` passed when calling :class:`~transformers.LayoutLMv2Model` or
-            :class:`~transformers.TFLayoutLMv2Model`.
-        hidden_size (:obj:`int`, `optional`, defaults to 768):
+            the `inputs_ids` passed when calling [`LayoutLMv2Model`] or [`TFLayoutLMv2Model`].
+        hidden_size (`int`, *optional*, defaults to 768):
             Dimension of the encoder layers and the pooler layer.
-        num_hidden_layers (:obj:`int`, `optional`, defaults to 12):
+        num_hidden_layers (`int`, *optional*, defaults to 12):
             Number of hidden layers in the Transformer encoder.
-        num_attention_heads (:obj:`int`, `optional`, defaults to 12):
+        num_attention_heads (`int`, *optional*, defaults to 12):
             Number of attention heads for each attention layer in the Transformer encoder.
-        intermediate_size (:obj:`int`, `optional`, defaults to 3072):
+        intermediate_size (`int`, *optional*, defaults to 3072):
             Dimension of the "intermediate" (i.e., feed-forward) layer in the Transformer encoder.
-        hidden_act (:obj:`str` or :obj:`function`, `optional`, defaults to :obj:`"gelu"`):
-            The non-linear activation function (function or string) in the encoder and pooler. If string,
-            :obj:`"gelu"`, :obj:`"relu"`, :obj:`"selu"` and :obj:`"gelu_new"` are supported.
-        hidden_dropout_prob (:obj:`float`, `optional`, defaults to 0.1):
+        hidden_act (`str` or `function`, *optional*, defaults to `"gelu"`):
+            The non-linear activation function (function or string) in the encoder and pooler. If string, `"gelu"`,
+            `"relu"`, `"selu"` and `"gelu_new"` are supported.
+        hidden_dropout_prob (`float`, *optional*, defaults to 0.1):
             The dropout probabilitiy for all fully connected layers in the embeddings, encoder, and pooler.
-        attention_probs_dropout_prob (:obj:`float`, `optional`, defaults to 0.1):
+        attention_probs_dropout_prob (`float`, *optional*, defaults to 0.1):
             The dropout ratio for the attention probabilities.
-        max_position_embeddings (:obj:`int`, `optional`, defaults to 512):
+        max_position_embeddings (`int`, *optional*, defaults to 512):
             The maximum sequence length that this model might ever be used with. Typically set this to something large
             just in case (e.g., 512 or 1024 or 2048).
-        type_vocab_size (:obj:`int`, `optional`, defaults to 2):
-            The vocabulary size of the :obj:`token_type_ids` passed when calling :class:`~transformers.LayoutLMv2Model`
-            or :class:`~transformers.TFLayoutLMv2Model`.
-        initializer_range (:obj:`float`, `optional`, defaults to 0.02):
+        type_vocab_size (`int`, *optional*, defaults to 2):
+            The vocabulary size of the `token_type_ids` passed when calling [`LayoutLMv2Model`] or
+            [`TFLayoutLMv2Model`].
+        initializer_range (`float`, *optional*, defaults to 0.02):
             The standard deviation of the truncated_normal_initializer for initializing all weight matrices.
-        layer_norm_eps (:obj:`float`, `optional`, defaults to 1e-12):
+        layer_norm_eps (`float`, *optional*, defaults to 1e-12):
             The epsilon used by the layer normalization layers.
-        max_2d_position_embeddings (:obj:`int`, `optional`, defaults to 1024):
+        max_2d_position_embeddings (`int`, *optional*, defaults to 1024):
             The maximum value that the 2D position embedding might ever be used with. Typically set this to something
             large just in case (e.g., 1024).
-        max_rel_pos (:obj:`int`, `optional`, defaults to 128):
+        max_rel_pos (`int`, *optional*, defaults to 128):
             The maximum number of relative positions to be used in the self-attention mechanism.
-        rel_pos_bins (:obj:`int`, `optional`, defaults to 32):
+        rel_pos_bins (`int`, *optional*, defaults to 32):
             The number of relative position bins to be used in the self-attention mechanism.
-        fast_qkv (:obj:`bool`, `optional`, defaults to :obj:`True`):
+        fast_qkv (`bool`, *optional*, defaults to `True`):
             Whether or not to use a single matrix for the queries, keys, values in the self-attention layers.
-        max_rel_2d_pos (:obj:`int`, `optional`, defaults to 256):
+        max_rel_2d_pos (`int`, *optional*, defaults to 256):
             The maximum number of relative 2D positions in the self-attention mechanism.
-        rel_2d_pos_bins (:obj:`int`, `optional`, defaults to 64):
+        rel_2d_pos_bins (`int`, *optional*, defaults to 64):
             The number of 2D relative position bins in the self-attention mechanism.
-        image_feature_pool_shape (:obj:`List[int]`, `optional`, defaults to [7, 7, 256]):
+        image_feature_pool_shape (`List[int]`, *optional*, defaults to [7, 7, 256]):
             The shape of the average-pooled feature map.
-        coordinate_size (:obj:`int`, `optional`, defaults to 128):
+        coordinate_size (`int`, *optional*, defaults to 128):
             Dimension of the coordinate embeddings.
-        shape_size (:obj:`int`, `optional`, defaults to 128):
+        shape_size (`int`, *optional*, defaults to 128):
             Dimension of the width and height embeddings.
-        has_relative_attention_bias (:obj:`bool`, `optional`, defaults to :obj:`True`):
+        has_relative_attention_bias (`bool`, *optional*, defaults to `True`):
             Whether or not to use a relative attention bias in the self-attention mechanism.
-        has_spatial_attention_bias (:obj:`bool`, `optional`, defaults to :obj:`True`):
+        has_spatial_attention_bias (`bool`, *optional*, defaults to `True`):
             Whether or not to use a spatial attention bias in the self-attention mechanism.
-        has_visual_segment_embedding (:obj:`bool`, `optional`, defaults to :obj:`False`):
+        has_visual_segment_embedding (`bool`, *optional*, defaults to `False`):
             Whether or not to add visual segment embeddings.
-        detectron2_config_args (:obj:`dict`, `optional`):
-            Dictionary containing the configuration arguments of the Detectron2 visual backbone. Refer to `this file
-            <https://github.com/microsoft/unilm/blob/master/layoutlmft/layoutlmft/models/layoutlmv2/detectron2_config.py>`__
+        detectron2_config_args (`dict`, *optional*):
+            Dictionary containing the configuration arguments of the Detectron2 visual backbone. Refer to [this
+            file](https://github.com/microsoft/unilm/blob/master/layoutlmft/layoutlmft/models/layoutlmv2/detectron2_config.py)
             for details regarding default values.
 
-    Example::
+    Example:
 
-        >>> from transformers import LayoutLMv2Model, LayoutLMv2Config
+    ```python
+    >>> from transformers import LayoutLMv2Model, LayoutLMv2Config
 
-        >>> # Initializing a LayoutLMv2 microsoft/layoutlmv2-base-uncased style configuration
-        >>> configuration = LayoutLMv2Config()
+    >>> # Initializing a LayoutLMv2 microsoft/layoutlmv2-base-uncased style configuration
+    >>> configuration = LayoutLMv2Config()
 
-        >>> # Initializing a model from the microsoft/layoutlmv2-base-uncased style configuration
-        >>> model = LayoutLMv2Model(configuration)
+    >>> # Initializing a model from the microsoft/layoutlmv2-base-uncased style configuration
+    >>> model = LayoutLMv2Model(configuration)
 
-        >>> # Accessing the model configuration
-        >>> configuration = model.config
-    """
+    >>> # Accessing the model configuration
+    >>> configuration = model.config
+    ```"""
     model_type = "layoutlmv2"
 
     def __init__(
@@ -248,47 +250,81 @@ class LayoutLMv2OnnxConfig(OnnxConfig):
 
     def generate_dummy_inputs(
         self,
-        tokenizer: PreTrainedTokenizer,
+        preprocessor: Union["PreTrainedTokenizerBase", "FeatureExtractionMixin"],
         batch_size: int = -1,
         seq_length: int = -1,
+        num_choices: int = -1,
         is_pair: bool = False,
         framework: Optional[TensorType] = None,
+        num_channels: int = 3,
+        image_width: int = 40,
+        image_height: int = 40,
+        tokenizer: "PreTrainedTokenizerBase" = None,
     ) -> Mapping[str, Any]:
         """
         Generate inputs to provide to the ONNX exporter for the specific framework
 
         Args:
-            tokenizer: The tokenizer associated with this model configuration
-            batch_size: The batch size (int) to export the model for (-1 means dynamic axis)
-            seq_length: The sequence length (int) to export the model for (-1 means dynamic axis)
-            is_pair: Indicate if the input is a pair (sentence 1, sentence 2)
-            framework: The framework (optional) the tokenizer will generate tensor for
+            preprocessor: ([`PreTrainedTokenizerBase`] or [`FeatureExtractionMixin`]):
+                The preprocessor associated with this model configuration.
+            batch_size (`int`, *optional*, defaults to -1):
+                The batch size to export the model for (-1 means dynamic axis).
+            num_choices (`int`, *optional*, defaults to -1):
+                The number of candidate answers provided for multiple choice task (-1 means dynamic axis).
+            seq_length (`int`, *optional*, defaults to -1):
+                The sequence length to export the model for (-1 means dynamic axis).
+            is_pair (`bool`, *optional*, defaults to `False`):
+                Indicate if the input is a pair (sentence 1, sentence 2)
+            framework (`TensorType`, *optional*, defaults to `None`):
+                The framework (PyTorch or TensorFlow) that the tokenizer will generate tensors for.
+            num_channels (`int`, *optional*, defaults to 3):
+                The number of channels of the generated images.
+            image_width (`int`, *optional*, defaults to 40):
+                The width of the generated images.
+            image_height (`int`, *optional*, defaults to 40):
+                The height of the generated images.
 
         Returns:
             Mapping[str, Tensor] holding the kwargs to provide to the model's forward function
         """
-
-        import torch
-
-        if not framework == TensorType.PYTORCH:
-            raise NotImplementedError("Exporting LayoutLM to ONNX is currently only supported for PyTorch.")
-
         if not is_torch_available():
             raise ValueError("Cannot generate dummy inputs without PyTorch installed.")
+        
+        import torch
 
-        batch_size = compute_effective_axis_dimension(
-            batch_size, fixed_dimension=OnnxConfig.DEFAULT_FIXED_BATCH, num_token_to_add=0
-        )
+        if preprocessor is not None:
+            preprocessor = preprocessor.tokenizer
 
-        token_to_add = tokenizer.num_special_tokens_to_add(is_pair)
-        seq_length = compute_effective_axis_dimension(
-            seq_length, fixed_dimension=OnnxConfig.DEFAULT_FIXED_SEQUENCE, num_token_to_add=token_to_add
-        )
+        if tokenizer is not None:
+            warnings.warn(
+                "The `tokenizer` argument is deprecated and will be removed in version 5 of Transformers. Use"
+                " `preprocessor` instead.",
+                FutureWarning,
+            )
+            logger.warning("Overwriting the `preprocessor` argument with `tokenizer` to generate dummmy inputs.")
+            preprocessor = tokenizer
+ 
+        if isinstance(preprocessor, PreTrainedTokenizerBase):
 
-        dummy_input = [[" ".join([tokenizer.unk_token])] * seq_length] * batch_size
-        box = [48, 84, 73, 128]
-        bbox = torch.tensor([*[box] * seq_length]).tile(batch_size, 1, 1)
-        input_dict = dict(tokenizer(dummy_input, boxes=bbox, return_tensors=framework))
-        input_dict["attention_mask"] = input_dict["attention_mask"].type(torch.float)
-        input_dict["image"] = torch.zeros((batch_size, 3, 224, 224), dtype=torch.int64)
+            batch_size = compute_effective_axis_dimension(
+                batch_size, fixed_dimension=OnnxConfig.DEFAULT_FIXED_BATCH, num_token_to_add=0
+            )
+
+            token_to_add = preprocessor.num_special_tokens_to_add(is_pair)
+            seq_length = compute_effective_axis_dimension(
+                seq_length, fixed_dimension=OnnxConfig.DEFAULT_FIXED_SEQUENCE, num_token_to_add=token_to_add
+            )
+
+            dummy_input = [[" ".join([preprocessor.unk_token])] * seq_length] * batch_size
+            box = [48, 84, 73, 128]
+            bbox = torch.tensor([*[box] * seq_length]).tile(batch_size, 1, 1)
+            input_dict = dict(preprocessor(dummy_input, boxes=bbox, return_tensors=framework))
+            input_dict["attention_mask"] = input_dict["attention_mask"].type(torch.float)
+            input_dict["image"] = torch.zeros((batch_size, 3, 224, 224), dtype=torch.int64)
+            
+        else:
+            raise ValueError(
+                "Unable to generate dummy inputs for the model. Please provide correct tokenizer or a preprocessor."
+            )
+
         return input_dict
