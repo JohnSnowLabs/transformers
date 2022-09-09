@@ -292,8 +292,8 @@ class LayoutLMv2OnnxConfig(OnnxConfig):
         
         import torch
 
-        if preprocessor is not None:
-            preprocessor = preprocessor.tokenizer
+        #if preprocessor is not None:
+        #    preprocessor = preprocessor.tokenizer
 
         if tokenizer is not None:
             warnings.warn(
