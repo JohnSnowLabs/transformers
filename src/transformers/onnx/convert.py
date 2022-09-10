@@ -287,12 +287,13 @@ def export_tensorflow(
 
 
 def export(
-    preprocessor: Union["PreTrainedTokenizer", "FeatureExtractionMixin", "ProcessorMixin"],
+    
     model: Union["PreTrainedModel", "TFPreTrainedModel"],
     config: OnnxConfig,
     opset: int,
     output: Path,
     tokenizer: "PreTrainedTokenizer" = None,
+    preprocessor: Union["PreTrainedTokenizer", "FeatureExtractionMixin", "ProcessorMixin"],
     device: str = "cpu",
 ) -> Tuple[List[str], List[str]]:
     """
