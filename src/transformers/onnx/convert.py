@@ -293,7 +293,7 @@ def export(
     opset: int,
     output: Path,
     tokenizer: "PreTrainedTokenizer" = None,
-    preprocessor: Union["PreTrainedTokenizer", "FeatureExtractionMixin", "ProcessorMixin"],
+    preprocessor: Union["PreTrainedTokenizer", "FeatureExtractionMixin", "ProcessorMixin"] = None,
     device: str = "cpu",
 ) -> Tuple[List[str], List[str]]:
     """
@@ -318,6 +318,11 @@ def export(
         `Tuple[List[str], List[str]]`: A tuple with an ordered list of the model's inputs, and the named inputs from
         the ONNX configuration.
     """
+    if tokenizer is None and preprocessor is None:
+        raise ValueError("Tokenizer and Preprocessor both are not provided. Please provide one of them.")
+    if preprocessor is None and tokenizer is not None:
+        preprocessor = tokenizer
+        tokenizer = None
     if not (is_torch_available() or is_tf_available()):
         raise ImportError(
             "Cannot convert because neither PyTorch nor TensorFlow are not installed. "
