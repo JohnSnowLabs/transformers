@@ -353,6 +353,12 @@ class FeaturesManager:
             "token-classification",
             onnx_config_cls="models.layoutlm.LayoutLMOnnxConfig",
         ),
+        "lilt": supported_features_mapping(
+            "default",
+            "sequence-classification",
+            "token-classification",
+            onnx_config_cls="models.lilt.LiltOnnxConfig",
+        ),
         "layoutlmv3": supported_features_mapping(
             "default",
             "question-answering",
